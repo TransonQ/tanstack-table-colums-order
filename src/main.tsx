@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
-import ReactDOM from 'react-dom/client';
-import { faker } from '@faker-js/faker';
+import React, { useEffect, useState } from 'react'
+import ReactDOM from 'react-dom/client'
+import { faker } from '@faker-js/faker'
 
-import './index.css';
+import './index.css'
 
 import {
   ColumnDef,
@@ -10,8 +10,8 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
-} from '@tanstack/react-table';
-import { makeData, Person } from './makeData';
+} from '@tanstack/react-table'
+import { makeData, Person } from './makeData'
 
 const defaultColumns: ColumnDef<Person>[] = [
   {
@@ -63,20 +63,30 @@ const defaultColumns: ColumnDef<Person>[] = [
       },
     ],
   },
-];
+]
+
+const defaultColumnsOrder = [
+  { id: 'firstName', label: 'firstName-1', visibility: true, selected: true },
+  { id: 'age', label: 'age-1', visibility: true, selected: true },
+  { id: 'visits', label: 'visits-1', visibility: true, selected: true },
+  { id: 'progress', label: 'progress-1', visibility: true, selected: true },
+  { id: 'lastName', label: 'lastName-1', visibility: true, selected: true },
+  { id: 'status', label: 'status-1', visibility: true, selected: true },
+]
 
 function App() {
-  const [data, setData] = React.useState(() => makeData(20));
-  const [columns] = React.useState(() => [...defaultColumns]);
-
-  const [columnVisibility, setColumnVisibility] = React.useState({});
-  const [columnOrder, setColumnOrder] = React.useState<ColumnOrderState>([]);
+  const [data, setData] = React.useState(() => makeData(20))
+  const [columns] = React.useState(() => [...defaultColumns])
+  const [columnVisibility, setColumnVisibility] = React.useState({})
+  const [columnOrder, setColumnOrder] = React.useState<ColumnOrderState>([])
 
   useEffect(() => {
-    console.log(columnOrder);
-  }, [columnOrder]);
+    console.log(columnOrder)
+  }, [columnOrder])
 
-  const rerender = () => setData(() => makeData(20));
+  const [columnsDndOrder, setColumnsDndOrder] = useState(defaultColumnsOrder)
+
+  const rerender = () => setData(() => makeData(20))
 
   const table = useReactTable({
     data,
@@ -91,15 +101,14 @@ function App() {
     debugTable: true,
     debugHeaders: true,
     debugColumns: true,
-  });
-
+  })
 
   // 更新的随机列
   const randomizeColumns = () => {
     table.setColumnOrder(
       faker.helpers.shuffle(table.getAllLeafColumns().map((d) => d.id))
-    );
-  };
+    )
+  }
 
   return (
     <div className="p-2">
@@ -118,27 +127,39 @@ function App() {
         </div>
         {table.getAllLeafColumns().map((column) => {
           return (
-            <div key={column.id} className="px-1">
+            <div
+              key={column.id}
+              className="px-1"
+            >
               <label>
                 <input
                   {...{
                     type: 'checkbox',
                     checked: column.getIsVisible(),
-                    onChange: column.getToggleVisibilityHandler(),
+                    // onChange: column.getToggleVisibilityHandler(),
+                    onChange: (e) => {
+                      column.toggleVisibility(!!e.target.checked)
+                    },
                   }}
                 />{' '}
                 {column.id}
               </label>
             </div>
-          );
+          )
         })}
       </div>
       <div className="h-4" />
       <div className="flex flex-wrap gap-2">
-        <button onClick={() => rerender()} className="border p-1">
+        <button
+          onClick={() => rerender()}
+          className="border p-1"
+        >
           Regenerate
         </button>
-        <button onClick={() => randomizeColumns()} className="border p-1">
+        <button
+          onClick={() => randomizeColumns()}
+          className="border p-1"
+        >
           Shuffle Columns
         </button>
       </div>
@@ -148,7 +169,10 @@ function App() {
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th key={header.id} colSpan={header.colSpan}>
+                <th
+                  key={header.id}
+                  colSpan={header.colSpan}
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -175,7 +199,10 @@ function App() {
           {table.getFooterGroups().map((footerGroup) => (
             <tr key={footerGroup.id}>
               {footerGroup.headers.map((header) => (
-                <th key={header.id} colSpan={header.colSpan}>
+                <th
+                  key={header.id}
+                  colSpan={header.colSpan}
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -190,14 +217,14 @@ function App() {
       </table>
       <pre>{JSON.stringify(table.getState().columnOrder, null, 2)}</pre>
     </div>
-  );
+  )
 }
 
-const rootElement = document.getElementById('root');
-if (!rootElement) throw new Error('Failed to find the root element');
+const rootElement = document.getElementById('root')
+if (!rootElement) throw new Error('Failed to find the root element')
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
-);
+)
