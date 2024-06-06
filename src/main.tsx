@@ -93,6 +93,8 @@ function App() {
     debugColumns: true,
   });
 
+
+  // 更新的随机列
   const randomizeColumns = () => {
     table.setColumnOrder(
       faker.helpers.shuffle(table.getAllLeafColumns().map((d) => d.id))
